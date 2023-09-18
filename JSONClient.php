@@ -9,7 +9,6 @@ use Elastic\Transport\TransportBuilder;
 use GuzzleHttp\Client as GuzzleHttpClient;
 use Sigmie\Http\Contracts\JSONClient as JSONClientInterface;
 use Sigmie\Http\Contracts\JSONRequest;
-use GuzzleHttp\Promise\Utils;
 use Http\Promise\Promise;
 
 class JSONClient implements JSONClientInterface
@@ -39,6 +38,7 @@ class JSONClient implements JSONClientInterface
     ): static {
         return self::create($hosts, [
             'headers' => ['Authorization' => "Bearer {$token}"],
+            ...$config
         ]);
     }
 
@@ -50,6 +50,7 @@ class JSONClient implements JSONClientInterface
     ): static {
         return self::create($hosts, [
             'auth' => [$username, $password],
+            ...$config
         ]);
     }
 
@@ -60,6 +61,7 @@ class JSONClient implements JSONClientInterface
     ): static {
         return self::create($hosts, [
             'headers' => $headers,
+            ...$config
         ]);
     }
 

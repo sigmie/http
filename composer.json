@@ -27,7 +27,10 @@
     },
     "suggest": {},
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
     },
     "minimum-stability": "stable"
 }
