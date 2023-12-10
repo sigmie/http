@@ -28,7 +28,7 @@ class JSONClient implements JSONClientInterface
     {
         $psrResponse = $this->http->sendRequest($jsonRequest);
 
-        return new JSONResponse($psrResponse);
+        return JSONResponse::fromPsrResponse($psrResponse);
     }
 
     public static function createWithToken(

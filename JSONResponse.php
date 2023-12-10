@@ -11,15 +11,19 @@ use LogicException;
 use Psr\Http\Message\ResponseInterface;
 use Sigmie\Http\Contracts\JSONResponse as JSONResponseInterface;
 
-class JSONResponse implements ArrayAccess, JSONResponseInterface
+class JSONResponse extends Response implements ArrayAccess, JSONResponseInterface
 {
-    protected ResponseInterface $response;
-
     protected null|Dot $decoded;
 
-    public function __construct(ResponseInterface $psrResponse)
+    public static function fromPsrResponse(ResponseInterface $responseInterface): static
     {
-        $this->response = $psrResponse;
+        return new static(
+            $responseInterface->getStatusCode(),
+            $responseInterface->getHeaders(),
+            $responseInterface->getBody(),
+            $responseInterface->getProtocolVersion(),
+            $responseInterface->getReasonPhrase()
+        );
     }
 
     /**
@@ -35,12 +39,12 @@ class JSONResponse implements ArrayAccess, JSONResponseInterface
      */
     public function body()
     {
-        return (string) $this->response->getBody();
+        return (string) $this->getBody();
     }
 
     public function json(null|int|string $key = null): int|bool|string|array|null|float
     {
-        if (! isset($this->decoded)) {
+        if (!isset($this->decoded)) {
             $this->decoded = dot(json_decode($this->body(), true));
         }
 
@@ -49,7 +53,7 @@ class JSONResponse implements ArrayAccess, JSONResponseInterface
 
     public function psr(): ResponseInterface
     {
-        return $this->response;
+        return $this;
     }
 
     /**
@@ -59,7 +63,7 @@ class JSONResponse implements ArrayAccess, JSONResponseInterface
      */
     public function header(string $header)
     {
-        return $this->response->getHeaderLine($header);
+        return $this->getHeaderLine($header);
     }
 
     public function failed(): bool
@@ -74,7 +78,7 @@ class JSONResponse implements ArrayAccess, JSONResponseInterface
 
     public function code(): int
     {
-        return (int) $this->response->getStatusCode();
+        return (int) $this->getStatusCode();
     }
 
     public function serverError(): bool
@@ -87,7 +91,7 @@ class JSONResponse implements ArrayAccess, JSONResponseInterface
      */
     public function offsetExists(mixed $offset): bool
     {
-        return ! is_null($this->json($offset));
+        return !is_null($this->json($offset));
     }
 
     /**
